@@ -19,7 +19,8 @@ server.post("/api/users", (req, res) => {
       })
       .catch((err) => {
         res.status(500).json({
-          message: "There was an error while saving the user to the database",
+          message: err.message,
+          custom: "There was an error while saving the user to the database",
         });
       });
   }
@@ -34,14 +35,32 @@ server.get("/api/users", (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .json({ message: "The users information could not be retrieved" });
+        .json({
+          message: err.message,
+          custom: "The users information could not be retrieved",
+        });
     });
 });
 
 // [GET] /api/users/:id
 server.get("/api/users/:id", (req, res) => {
-  res.status(200).json({ message: "get specific user" });
-  console.log("GET");
+  const { id } = req.params;
+  User.findById(id)
+    .then((user) => {
+      if (!user) {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist" });
+      } else {
+        res.status(200).json(user);
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: err.message,
+        custom: "The user information could not be retrieved",
+      });
+    });
 });
 
 // [DELETE] /api/users/:id
