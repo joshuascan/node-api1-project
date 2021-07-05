@@ -1,14 +1,21 @@
 // BUILD YOUR SERVER HERE
 const express = require('express')
 const server = express()
-const Users = require('./users/model')
+const User = require('./users/model')
 
 server.use(express.json())
 
 // [POST] /api/users
 server.post('/api/users', (req, res) => {
-    res.status(200).json({message: 'post new user'});
-    console.log('POST')
+    if (!req.body.name || !req.body.bio) {
+        res.status(400).json({ message: 'Please provide name and bio for the user'})
+    } else {
+        const { name, bio } = req.body;
+        User.insert({ name, bio })
+            .then((user) => {
+                res.status(201).json(user)
+            })
+    }
 })
 
 // [GET] /api/users
