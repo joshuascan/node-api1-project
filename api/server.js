@@ -78,8 +78,23 @@ server.delete("/api/users/:id", (req, res) => {
 
 // [PUT] /api/users/:id
 server.put("/api/users/:id", (req, res) => {
-  res.status(201).json({ message: "edit user" });
-  console.log("EDIT");
+  const { id } = req.params;
+  const { name, bio } = req.body;
+  if (!name || !bio) {
+    res
+      .status(400)
+      .json({ message: "Please provide name and bio for the user" });
+  } else {
+    User.update(id, { name, bio }).then((updated) => {
+      if (!updated) {
+        res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist" });
+      } else {
+        res.status(200).json(updated);
+      }
+    });
+  }
 });
 
 module.exports = server; // EXPORT YOUR SERVER instead of {}
